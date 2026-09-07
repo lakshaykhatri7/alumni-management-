@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Jobs - AlumniMS{% endblock %}
+{% block content %}
+<h2 class="mb-4">Job Board</h2>
+
+<div class="card p-3 mb-4">
+  <h5>Post a Job</h5>
+  <form method="post" action="{{ url_for('jobs_add') }}" class="row g-2 mt-1">
+    <div class="col-md-3"><input name="title" class="form-control" placeholder="Job title" required></div>
+    <div class="col-md-3"><input name="company" class="form-control" placeholder="Company"></div>
+    <div class="col-md-2"><input name="location" class="form-control" placeholder="Location"></div>
+    <div class="col-md-3">
+      <select name="posted_by_id" class="form-select">
+        <option value="">Posted by (optional)</option>
+        {% for a in all_alumni %}<option value="{{ a.id }}">{{ a.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1"><button class="btn btn-primary w-100">Post</button></div>
+    <div class="col-md-12"><textarea name="description" class="form-control" placeholder="Description" rows="2"></textarea></div>
+    <div class="col-md-12 form-check">
+      <input class="form-check-input" type="checkbox" name="notify" value="1" id="jobNotify" {{ '' if mail_on else 'disabled' }}>
+      <label class="form-check-label" for="jobNotify">Email all alumni about this job {{ '' if mail_on else '(configure mail in .env to enable)' }}</label>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3">
+{% for j in jobs %}
+  <div class="col-md-6">
+    <div class="card p-3">
+      <div class="d-flex justify-content-between">
+        <div>
+          <h5>{{ j.title }}</h5>
+          <p class="text-muted mb-1">{{ j.company or '-' }} &middot; {{ j.location or '-' }}</p>
+          <p class="mb-1">{{ j.description or '' }}</p>
+          <small class="text-muted">Posted by {{ j.posted_by_name or 'Admin' }}</small>
+        </div>
+        <div class="text-end">
+          <button class="btn btn-sm btn-outline-secondary mb-1" onclick="matchAlumni({{ j.id }})" title="AI: find fitting alumni"><i class="bi bi-robot"></i></button><br>
+          <form action="{{ url_for('jobs_delete', id=j.id) }}" method="post" onsubmit="return confirm('Delete?');">
+            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+      </div>
+      <div id="matches-{{ j.id }}" class="mt-2 small"></div>
+    </div>
+  </div>
+{% else %}
+  <p class="text-muted">No jobs posted yet.</p>
+{% endfor %}
+</div>
+<script>
+async function matchAlumni(id) {
+  const box = document.getElementById('matches-' + id);
+  box.innerHTML = '<span class="text-muted">Matching (AI, local, free)...</span>';
+  const res = await fetch(`/jobs/${id}/match`);
+  const data = await res.json();
+  if (data.error || !data.matches.length) { box.innerHTML = '<span class="text-muted">No strong matches found.</span>'; return; }
+  box.innerHTML = '<strong>Suggested alumni:</strong><ul class="mb-0">' +
+    data.matches.map(m => `<li>${m.name} (${m.email})${m.company ? ' - ' + m.company : ''}</li>`).join('') + '</ul>';
+}
+</script>
+{% endblock %}

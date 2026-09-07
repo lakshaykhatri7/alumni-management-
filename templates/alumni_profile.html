@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ alum.name }} - AlumniMS{% endblock %}
+{% block content %}
+<a href="{{ url_for('alumni_list') }}" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Back</a>
+<div class="card p-4 mb-4">
+  <div class="d-flex justify-content-between">
+    <div>
+      <h3>{{ alum.name }}</h3>
+      <p class="text-muted mb-1">{{ alum.designation or '' }} {{ 'at ' + alum.current_company if alum.current_company else '' }}</p>
+      <p class="mb-1"><i class="bi bi-envelope"></i> {{ alum.email }} &nbsp; <i class="bi bi-telephone"></i> {{ alum.phone or '-' }}</p>
+      <p class="mb-1"><i class="bi bi-mortarboard"></i> Batch {{ alum.batch_year or '-' }}, {{ alum.department or '-' }}</p>
+      <p class="mb-1"><i class="bi bi-geo-alt"></i> {{ alum.city or '-' }}</p>
+      {% if alum.linkedin %}<p><a href="{{ alum.linkedin }}" target="_blank">LinkedIn Profile</a></p>{% endif %}
+    </div>
+    <a href="{{ url_for('alumni_edit', id=alum.id) }}" class="btn btn-outline-secondary h-25"><i class="bi bi-pencil"></i> Edit</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h5>Donations</h5>
+      <table class="table table-sm mt-2">
+        <thead><tr><th>Amount</th><th>Purpose</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for d in donations %}
+          <tr><td>₹{{ d.amount }}</td><td>{{ d.purpose or '-' }}</td><td>{{ d.donation_date }}</td></tr>
+        {% else %}
+          <tr><td colspan="3" class="text-muted">No donations yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h5>Events Registered</h5>
+      <table class="table table-sm mt-2">
+        <thead><tr><th>Title</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for e in events %}
+          <tr><td>{{ e.title }}</td><td>{{ e.event_date or '-' }}</td></tr>
+        {% else %}
+          <tr><td colspan="2" class="text-muted">Not registered for any events.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

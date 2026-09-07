@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} - AlumniMS{% endblock %}
+{% block content %}
+<a href="{{ url_for('events_list') }}" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Back</a>
+<div class="card p-4 mb-4">
+  <h3>{{ event.title }}</h3>
+  <p class="text-muted">{{ event.event_date or '-' }} &nbsp;|&nbsp; {{ event.location or '-' }}</p>
+  <p>{{ event.description or '' }}</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h5>Registered Alumni ({{ registered|length }})</h5>
+      <ul class="list-group mt-2">
+        {% for a in registered %}
+          <li class="list-group-item">{{ a.name }} <span class="text-muted">({{ a.email }})</span></li>
+        {% else %}
+          <li class="list-group-item text-muted">No registrations yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-3">
+      <h5>Register Alumni</h5>
+      <form method="post" action="{{ url_for('events_register', id=event.id) }}" class="d-flex gap-2 mt-2">
+        <select name="alumni_id" class="form-select" required>
+          <option value="">Select alumni</option>
+          {% for a in all_alumni %}
+            <option value="{{ a.id }}">{{ a.name }} ({{ a.email }})</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-primary">Add</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

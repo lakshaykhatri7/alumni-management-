@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Alumni Management System{% endblock %}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #087f5b;
+    --primary-dark: #056344;
+    --ink: #18322b;
+    --muted: #64756e;
+    --sidebar-bg: #12352e;
+    --sidebar-bg2: #0c2721;
+  }
+  body { background:#f4f7f4; font-family:'DM Sans', sans-serif; color:var(--ink); }
+  h1,h2,h3,h4,h5,h6 { font-family:'Manrope', sans-serif; font-weight:700; letter-spacing:0; }
+
+  .sidebar {
+    min-height:100vh; width:238px; position:sticky; top:0; flex-shrink:0;
+    background:var(--sidebar-bg); padding:1rem 0 2rem;
+  }
+  .sidebar .brand {
+    font-family:'Manrope', sans-serif; font-weight:800; font-size:1.15rem; color:#fff;
+    padding:.7rem 1.35rem 1.55rem; display:flex; align-items:center; gap:.6rem;
+  }
+  .sidebar .brand i { color:#a8e6bf; }
+  .sidebar a {
+    color:#b9ccc4; padding:.66rem .9rem; display:flex; align-items:center; gap:.7rem;
+    text-decoration:none; border-radius:6px; margin:.18rem .75rem; font-size:.9rem; font-weight:500;
+    transition:all .15s ease;
+  }
+  .sidebar a i { font-size:1.05rem; width:20px; text-align:center; }
+  .sidebar a:hover { background:rgba(255,255,255,.09); color:#fff; }
+  .sidebar a.active { background:#d9f5e2; color:#124535; box-shadow:none; }
+
+  .main-content { max-width:1440px; padding:2.4rem 2.75rem; }
+
+  .card { border:1px solid #dfe8e1; box-shadow:0 2px 8px rgba(24,50,43,.035); border-radius:7px; }
+
+  .stat-card {
+    border-radius:7px; color:#fff; padding:1.35rem 1.45rem; position:relative; overflow:hidden;
+    box-shadow:none;
+  }
+  .stat-card .icon-badge {
+    position:absolute; right:1rem; top:1rem; font-size:2.2rem; opacity:.25;
+  }
+  .stat-card h3 { font-weight:700; margin-bottom:0; font-size:1.9rem; }
+  .stat-card .label { font-size:.85rem; opacity:.9; font-weight:500; }
+  .bg-grad-primary { background:#087f5b; }
+  .bg-grad-success { background:#167a75; }
+  .bg-grad-purple  { background:#405b8a; }
+  .bg-grad-warning { background:#a96420; }
+
+  .table thead { background:#edf3ee; color:#486057; }
+  .table thead th { font-weight:500; font-size:.85rem; border:none; padding:.85rem 1rem; }
+  .table tbody td { padding:.85rem 1rem; vertical-align:middle; font-size:.92rem; }
+  .table tbody tr:hover { background:#f4faf5; }
+
+  .btn-primary { background:var(--primary); border-color:var(--primary); }
+  .btn-primary:hover { background:var(--primary-dark); border-color:var(--primary-dark); }
+  .btn { border-radius:6px; font-weight:600; font-size:.88rem; }
+
+  .form-control, .form-select { border-radius:8px; border:1px solid #e2e3f1; font-size:.92rem; }
+  .form-control:focus, .form-select:focus { border-color:var(--primary); box-shadow:0 0 0 .2rem rgba(8,127,91,.14); }
+
+  .badge { font-weight:500; }
+  .page-title { font-weight:800; margin-bottom:1.5rem; color:var(--ink); }
+  .card-header-clean { padding:1.1rem 1.25rem; border-bottom:1px solid #e7eee8; font-weight:700; }
+  .page-kicker { color:var(--muted); font-size:.94rem; margin:0; }
+  .section-link { color:var(--primary); font-size:.86rem; font-weight:700; text-decoration:none; }
+  .mobile-nav { display:none; }
+  @media (max-width: 767.98px) {
+    .app-shell { display:block !important; }
+    .sidebar { display:none; }
+    .mobile-nav { display:flex; background:var(--sidebar-bg); padding:.7rem 1rem; align-items:center; justify-content:space-between; }
+    .mobile-nav .brand { color:#fff; font-family:'Manrope', sans-serif; font-weight:800; text-decoration:none; }
+    .mobile-nav .brand i { color:#a8e6bf; }
+    .mobile-nav .btn { color:#fff; border-color:#78a597; }
+    .mobile-links { background:var(--sidebar-bg); padding:0 .75rem .75rem; }
+    .mobile-links a { color:#dcebe3; display:block; padding:.6rem .75rem; text-decoration:none; border-radius:6px; }
+    .mobile-links a.active { background:#d9f5e2; color:#124535; }
+    .main-content { padding:1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+<nav class="mobile-nav">
+  <a class="brand" href="{{ url_for('dashboard') }}"><i class="bi bi-mortarboard-fill"></i> AlumniMS</a>
+  <button class="btn btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#mobileLinks" aria-label="Toggle navigation"><i class="bi bi-list fs-5"></i></button>
+</nav>
+<div class="collapse mobile-links" id="mobileLinks">
+  <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' }}">Dashboard</a>
+  <a href="{{ url_for('alumni_list') }}" class="{{ 'active' if request.endpoint in ['alumni_list','alumni_add','alumni_edit','alumni_profile'] }}">Alumni</a>
+  <a href="{{ url_for('events_list') }}" class="{{ 'active' if request.endpoint in ['events_list','events_add','events_detail'] }}">Events</a>
+  <a href="{{ url_for('donations_list') }}" class="{{ 'active' if request.endpoint=='donations_list' }}">Donations</a>
+  <a href="{{ url_for('jobs_list') }}" class="{{ 'active' if request.endpoint=='jobs_list' }}">Jobs</a>
+  <a href="{{ url_for('reports_page') }}" class="{{ 'active' if request.endpoint=='reports_page' }}">Reports</a>
+  <a href="{{ url_for('ai_chat_page') }}" class="{{ 'active' if request.endpoint=='ai_chat_page' }}">AI Assistant</a>
+</div>
+<div class="d-flex app-shell">
+  <div class="sidebar">
+    <div class="brand"><i class="bi bi-mortarboard-fill"></i> AlumniMS</div>
+    <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="{{ url_for('alumni_list') }}" class="{{ 'active' if request.endpoint in ['alumni_list','alumni_add','alumni_edit','alumni_profile'] }}"><i class="bi bi-people-fill"></i> Alumni</a>
+    <a href="{{ url_for('events_list') }}" class="{{ 'active' if request.endpoint in ['events_list','events_add','events_detail'] }}"><i class="bi bi-calendar-event-fill"></i> Events</a>
+    <a href="{{ url_for('donations_list') }}" class="{{ 'active' if request.endpoint=='donations_list' }}"><i class="bi bi-cash-coin"></i> Donations</a>
+    <a href="{{ url_for('jobs_list') }}" class="{{ 'active' if request.endpoint=='jobs_list' }}"><i class="bi bi-briefcase-fill"></i> Jobs</a>
+    <a href="{{ url_for('reports_page') }}" class="{{ 'active' if request.endpoint=='reports_page' }}"><i class="bi bi-bar-chart-fill"></i> Reports</a>
+    <a href="{{ url_for('ai_chat_page') }}" class="{{ 'active' if request.endpoint=='ai_chat_page' }}"><i class="bi bi-robot"></i> AI Assistant</a>
+  </div>
+  <div class="flex-grow-1">
+    <div class="main-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, msg in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if alumni else 'Add' }} Alumni - AlumniMS{% endblock %}
+{% block content %}
+<h2 class="mb-4">{{ 'Edit Alumni' if alumni else 'Add Alumni' }}</h2>
+<div class="card p-4" style="max-width:700px;">
+<form method="post">
+  <div class="row g-3">
+    <div class="col-md-6"><label class="form-label">Name *</label><input required name="name" class="form-control" value="{{ alumni.name if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Email *</label><input required type="email" name="email" class="form-control" value="{{ alumni.email if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Phone</label><input name="phone" class="form-control" value="{{ alumni.phone if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Batch Year</label><input type="number" name="batch_year" class="form-control" value="{{ alumni.batch_year if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Department</label><input name="department" class="form-control" value="{{ alumni.department if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">City</label><input name="city" class="form-control" value="{{ alumni.city if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Current Company</label><input name="current_company" class="form-control" value="{{ alumni.current_company if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Designation</label><input name="designation" class="form-control" value="{{ alumni.designation if alumni else '' }}"></div>
+    <div class="col-md-12"><label class="form-label">LinkedIn URL</label><input name="linkedin" class="form-control" value="{{ alumni.linkedin if alumni else '' }}"></div>
+  </div>
+  <div class="mt-4">
+    <button class="btn btn-primary">Save</button>
+    <a href="{{ url_for('alumni_list') }}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+</div>
+{% endblock %}

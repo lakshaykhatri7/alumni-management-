@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}AI Assistant - AlumniMS{% endblock %}
+{% block content %}
+<h2 class="mb-3"><i class="bi bi-robot"></i> AI Assistant</h2>
+
+{% if not gemini_on %}
+<div class="alert alert-warning">
+  <strong>Chatbot needs a free Gemini API key.</strong><br>
+  1. Get one free at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> (no billing needed for free tier).<br>
+  2. Run app with: <code>GEMINI_API_KEY=your_key python3 app.py</code><br>
+  Everything else (AI semantic search on Alumni page, job matching) already works with no key, no cost.
+</div>
+{% endif %}
+
+<div class="card p-3 mb-4">
+  <h5>Ask about your alumni database</h5>
+  <p class="text-muted small">e.g. "How many alumni from 2020 batch?", "Who donated more than 1000?", "List alumni working at Google"</p>
+  <div class="input-group">
+    <input type="text" id="chatQ" class="form-control" placeholder="Ask a question..." {{ 'disabled' if not gemini_on }}>
+    <button class="btn btn-primary" onclick="askBot()" {{ 'disabled' if not gemini_on }}>Ask</button>
+  </div>
+  <div id="chatAnswer" class="mt-3"></div>
+</div>
+
+<script>
+async function askBot() {
+  const q = document.getElementById('chatQ').value;
+  if (!q) return;
+  const box = document.getElementById('chatAnswer');
+  box.innerHTML = '<span class="text-muted">Thinking...</span>';
+  const res = await fetch('/ai/chat/ask', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({question: q})
+  });
+  const data = await res.json();
+  if (data.error) {
+    box.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+  } else {
+    box.innerHTML = `<div class="alert alert-success">${data.answer}</div><small class="text-muted">SQL: <code>${data.sql}</code></small>`;
+  }
+}
+document.getElementById('chatQ')?.addEventListener('keydown', e => { if(e.key==='Enter') askBot(); });
+</script>
+{% endblock %}

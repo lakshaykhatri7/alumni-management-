@@ -1,0 +1,9 @@
+flask
+python-dotenv
+sentence-transformers
+google-genai
+openpyxl
+reportlab
+flask-mail
+psycopg2-binary
+gunicorn
