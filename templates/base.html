@@ -11,39 +11,43 @@
   :root {
     --primary: #087f5b;
     --primary-dark: #056344;
-    --ink: #18322b;
+    --ink: #17352d;
     --muted: #64756e;
-    --sidebar-bg: #12352e;
-    --sidebar-bg2: #0c2721;
+    --sidebar-bg: #0b3028;
+    --sidebar-bg2: #08241f;
+    --surface: #ffffff;
+    --line: #dce8e1;
   }
-  body { background:#f4f7f4; font-family:'DM Sans', sans-serif; color:var(--ink); }
+  body { background:#f1f6f3; font-family:'DM Sans', sans-serif; color:var(--ink); }
   h1,h2,h3,h4,h5,h6 { font-family:'Manrope', sans-serif; font-weight:700; letter-spacing:0; }
 
   .sidebar {
-    min-height:100vh; width:238px; position:sticky; top:0; flex-shrink:0;
-    background:var(--sidebar-bg); padding:1rem 0 2rem;
+    min-height:100vh; width:248px; position:sticky; top:0; flex-shrink:0;
+    background:linear-gradient(160deg, var(--sidebar-bg), var(--sidebar-bg2)); padding:1.25rem .35rem 2rem;
+    box-shadow:8px 0 28px rgba(8,47,38,.08);
   }
   .sidebar .brand {
     font-family:'Manrope', sans-serif; font-weight:800; font-size:1.15rem; color:#fff;
-    padding:.7rem 1.35rem 1.55rem; display:flex; align-items:center; gap:.6rem;
+    padding:.7rem 1.35rem 2rem; display:flex; align-items:center; gap:.6rem; letter-spacing:-.02em;
   }
-  .sidebar .brand i { color:#a8e6bf; }
+  .sidebar .brand i { color:#9ce7b9; font-size:1.3rem; }
+  .sidebar::after { content:'ALUMNI COMMUNITY'; display:block; color:#7fa99d; font-size:.63rem; letter-spacing:.14em; font-weight:700; padding:.7rem 1.35rem .25rem; }
   .sidebar a {
-    color:#b9ccc4; padding:.66rem .9rem; display:flex; align-items:center; gap:.7rem;
-    text-decoration:none; border-radius:6px; margin:.18rem .75rem; font-size:.9rem; font-weight:500;
-    transition:all .15s ease;
+    color:#b9ccc4; padding:.76rem .9rem; display:flex; align-items:center; gap:.7rem;
+    text-decoration:none; border-radius:9px; margin:.2rem .55rem; font-size:.9rem; font-weight:500;
+    transition:all .18s ease;
   }
   .sidebar a i { font-size:1.05rem; width:20px; text-align:center; }
-  .sidebar a:hover { background:rgba(255,255,255,.09); color:#fff; }
-  .sidebar a.active { background:#d9f5e2; color:#124535; box-shadow:none; }
+  .sidebar a:hover { background:rgba(255,255,255,.1); color:#fff; transform:translateX(2px); }
+  .sidebar a.active { background:#d7f3e0; color:#124535; box-shadow:0 5px 16px rgba(0,0,0,.12); }
 
-  .main-content { max-width:1440px; padding:2.4rem 2.75rem; }
+  .main-content { max-width:1480px; padding:2.65rem clamp(1.25rem, 3.4vw, 3.75rem); }
 
-  .card { border:1px solid #dfe8e1; box-shadow:0 2px 8px rgba(24,50,43,.035); border-radius:7px; }
+  .card { background:var(--surface); border:1px solid var(--line); box-shadow:0 8px 24px rgba(24,50,43,.045); border-radius:10px; }
 
   .stat-card {
-    border-radius:7px; color:#fff; padding:1.35rem 1.45rem; position:relative; overflow:hidden;
-    box-shadow:none;
+    border-radius:10px; color:#fff; padding:1.45rem 1.5rem; position:relative; overflow:hidden;
+    box-shadow:0 10px 22px rgba(20,65,52,.12);
   }
   .stat-card .icon-badge {
     position:absolute; right:1rem; top:1rem; font-size:2.2rem; opacity:.25;
@@ -55,28 +59,32 @@
   .bg-grad-purple  { background:#405b8a; }
   .bg-grad-warning { background:#a96420; }
 
-  .table thead { background:#edf3ee; color:#486057; }
+  .table thead { background:#eef5f0; color:#486057; }
   .table thead th { font-weight:500; font-size:.85rem; border:none; padding:.85rem 1rem; }
   .table tbody td { padding:.85rem 1rem; vertical-align:middle; font-size:.92rem; }
   .table tbody tr:hover { background:#f4faf5; }
 
   .btn-primary { background:var(--primary); border-color:var(--primary); }
   .btn-primary:hover { background:var(--primary-dark); border-color:var(--primary-dark); }
-  .btn { border-radius:6px; font-weight:600; font-size:.88rem; }
+  .btn { border-radius:7px; font-weight:600; font-size:.88rem; }
 
   .form-control, .form-select { border-radius:8px; border:1px solid #e2e3f1; font-size:.92rem; }
   .form-control:focus, .form-select:focus { border-color:var(--primary); box-shadow:0 0 0 .2rem rgba(8,127,91,.14); }
 
   .badge { font-weight:500; }
-  .page-title { font-weight:800; margin-bottom:1.5rem; color:var(--ink); }
+  .page-title { font-weight:800; margin-bottom:1.5rem; color:var(--ink); letter-spacing:-.035em; }
   .card-header-clean { padding:1.1rem 1.25rem; border-bottom:1px solid #e7eee8; font-weight:700; }
   .page-kicker { color:var(--muted); font-size:.94rem; margin:0; }
   .section-link { color:var(--primary); font-size:.86rem; font-weight:700; text-decoration:none; }
   .mobile-nav { display:none; }
+  .alert { border-radius:9px; border-width:1px; }
+  .table { --bs-table-bg: transparent; }
+  a { color:var(--primary); }
+  ::selection { background:#bdebd0; color:var(--ink); }
   @media (max-width: 767.98px) {
     .app-shell { display:block !important; }
     .sidebar { display:none; }
-    .mobile-nav { display:flex; background:var(--sidebar-bg); padding:.7rem 1rem; align-items:center; justify-content:space-between; }
+    .mobile-nav { display:flex; background:var(--sidebar-bg); padding:.85rem 1rem; align-items:center; justify-content:space-between; box-shadow:0 4px 14px rgba(8,47,38,.12); }
     .mobile-nav .brand { color:#fff; font-family:'Manrope', sans-serif; font-weight:800; text-decoration:none; }
     .mobile-nav .brand i { color:#a8e6bf; }
     .mobile-nav .btn { color:#fff; border-color:#78a597; }
@@ -85,46 +93,95 @@
     .mobile-links a.active { background:#d9f5e2; color:#124535; }
     .main-content { padding:1.5rem 1rem; }
   }
+  .auth-page { min-height:100vh; background:#e4e9e7; }
+  .auth-card-wrap { width:100%; max-width:960px; padding:2rem 1rem; }
 </style>
 </head>
 <body>
+{% if session.get('user_id') %}
 <nav class="mobile-nav">
   <a class="brand" href="{{ url_for('dashboard') }}"><i class="bi bi-mortarboard-fill"></i> AlumniMS</a>
   <button class="btn btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#mobileLinks" aria-label="Toggle navigation"><i class="bi bi-list fs-5"></i></button>
 </nav>
 <div class="collapse mobile-links" id="mobileLinks">
   <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' }}">Dashboard</a>
+  {% if session.get('role') == 'admin' %}
   <a href="{{ url_for('alumni_list') }}" class="{{ 'active' if request.endpoint in ['alumni_list','alumni_add','alumni_edit','alumni_profile'] }}">Alumni</a>
+  {% endif %}
   <a href="{{ url_for('events_list') }}" class="{{ 'active' if request.endpoint in ['events_list','events_add','events_detail'] }}">Events</a>
+  {% if session.get('role') == 'admin' %}
   <a href="{{ url_for('donations_list') }}" class="{{ 'active' if request.endpoint=='donations_list' }}">Donations</a>
+  {% endif %}
   <a href="{{ url_for('jobs_list') }}" class="{{ 'active' if request.endpoint=='jobs_list' }}">Jobs</a>
+  {% if session.get('alumni_id') %}
+  <a href="{{ url_for('messages_inbox') }}" class="{{ 'active' if request.endpoint in ['messages_inbox','messages_thread'] }}">Messages</a>
+  <a href="{{ url_for('donate_page') }}" class="{{ 'active' if request.endpoint=='donate_page' }}">Donate</a>
+  {% endif %}
+  {% if session.get('role') == 'admin' %}
   <a href="{{ url_for('reports_page') }}" class="{{ 'active' if request.endpoint=='reports_page' }}">Reports</a>
+  <a href="{{ url_for('matches_overview') }}" class="{{ 'active' if request.endpoint=='matches_overview' }}">Matches</a>
+  {% endif %}
   <a href="{{ url_for('ai_chat_page') }}" class="{{ 'active' if request.endpoint=='ai_chat_page' }}">AI Assistant</a>
 </div>
+{% endif %}
 <div class="d-flex app-shell">
+  {% if session.get('user_id') %}
   <div class="sidebar">
     <div class="brand"><i class="bi bi-mortarboard-fill"></i> AlumniMS</div>
     <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint=='dashboard' }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    {% if session.get('role') == 'admin' %}
     <a href="{{ url_for('alumni_list') }}" class="{{ 'active' if request.endpoint in ['alumni_list','alumni_add','alumni_edit','alumni_profile'] }}"><i class="bi bi-people-fill"></i> Alumni</a>
+    {% endif %}
     <a href="{{ url_for('events_list') }}" class="{{ 'active' if request.endpoint in ['events_list','events_add','events_detail'] }}"><i class="bi bi-calendar-event-fill"></i> Events</a>
+    {% if session.get('role') == 'admin' %}
     <a href="{{ url_for('donations_list') }}" class="{{ 'active' if request.endpoint=='donations_list' }}"><i class="bi bi-cash-coin"></i> Donations</a>
+    {% endif %}
     <a href="{{ url_for('jobs_list') }}" class="{{ 'active' if request.endpoint=='jobs_list' }}"><i class="bi bi-briefcase-fill"></i> Jobs</a>
+    {% if session.get('alumni_id') %}
+    <a href="{{ url_for('messages_inbox') }}" class="{{ 'active' if request.endpoint in ['messages_inbox','messages_thread'] }}"><i class="bi bi-chat-dots-fill"></i> Messages</a>
+    <a href="{{ url_for('donate_page') }}" class="{{ 'active' if request.endpoint=='donate_page' }}"><i class="bi bi-heart-fill"></i> Donate</a>
+    {% endif %}
+    {% if session.get('role') == 'admin' %}
     <a href="{{ url_for('reports_page') }}" class="{{ 'active' if request.endpoint=='reports_page' }}"><i class="bi bi-bar-chart-fill"></i> Reports</a>
+    <a href="{{ url_for('matches_overview') }}" class="{{ 'active' if request.endpoint=='matches_overview' }}"><i class="bi bi-shuffle"></i> Matches</a>
+    {% endif %}
     <a href="{{ url_for('ai_chat_page') }}" class="{{ 'active' if request.endpoint=='ai_chat_page' }}"><i class="bi bi-robot"></i> AI Assistant</a>
   </div>
+  {% endif %}
   <div class="flex-grow-1">
-    <div class="main-content">
+    <div class="main-content {{ '' if session.get('user_id') else 'auth-page d-flex align-items-center justify-content-center' }}">
+      <div class="{{ '' if session.get('user_id') else 'auth-card-wrap' }}">
+      {% if session.get('user_id') %}
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <small class="text-muted d-block">Signed in as</small>
+          <strong>{{ session.get('email') }}</strong>
+        </div>
+        <div class="d-flex gap-2">
+          {% if session.get('alumni_id') %}
+          <a href="{{ url_for('profile_edit') }}" class="btn btn-sm btn-outline-primary">Edit Profile</a>
+          {% endif %}
+          {% if session.get('role') != 'admin' %}
+          <a href="{{ url_for('mentor_recommend') }}?alumni_id={{ session.get('alumni_id') or '' }}" class="btn btn-sm btn-outline-primary">Career Mentor</a>
+          {% else %}
+          <a href="{{ url_for('mentor_overview') }}" class="btn btn-sm btn-outline-primary">Mentor Matches</a>
+          {% endif %}
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-secondary">Logout</a>
+        </div>
+      </div>
+      {% endif %}
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, msg in messages %}
             <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
               {{ msg }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss notification"></button>
             </div>
           {% endfor %}
         {% endif %}
       {% endwith %}
       {% block content %}{% endblock %}
+      </div>
     </div>
   </div>
 </div>

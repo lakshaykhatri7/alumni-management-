@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Login - AlumniMS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-5 col-md-7">
+    <div class="card shadow-sm">
+      <div class="card-header-clean text-center">
+        <h3 class="mb-0">Alumni Login</h3>
+      </div>
+      <div class="p-4">
+        <div class="btn-group w-100 mb-3" role="group" aria-label="Login as">
+          <input type="radio" class="btn-check" name="login_role_toggle" id="role-alumni" value="alumni" checked>
+          <label class="btn btn-outline-primary" for="role-alumni">Alumni</label>
+          <input type="radio" class="btn-check" name="login_role_toggle" id="role-admin" value="admin">
+          <label class="btn btn-outline-primary" for="role-admin">Admin</label>
+        </div>
+
+        <form method="post">
+          <input type="hidden" name="login_role" id="login_role" value="alumni">
+          <div class="mb-3">
+            <label for="email" class="form-label" id="email-label">Alumni Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+            <div class="text-end mt-1">
+              <a href="{{ url_for('forgot_password') }}" class="small">Forgot password?</a>
+            </div>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary" id="login-submit">Login as Alumni</button>
+          </div>
+        </form>
+
+        <p class="text-center mt-3 mb-0">
+          New alumni? <a href="{{ url_for('signup') }}">Create an account</a>
+        </p>
+      </div>
+
+      <script>
+        (function () {
+          var roleInput = document.getElementById("login_role");
+          var emailLabel = document.getElementById("email-label");
+          var submitBtn = document.getElementById("login-submit");
+          var emailField = document.getElementById("email");
+          var radios = document.querySelectorAll('input[name="login_role_toggle"]');
+          radios.forEach(function (radio) {
+            radio.addEventListener("change", function () {
+              var role = this.value;
+              roleInput.value = role;
+              if (role === "admin") {
+                emailLabel.textContent = "Admin Email";
+                submitBtn.textContent = "Login as Admin";
+                emailField.placeholder = "admin@alumni.local";
+              } else {
+                emailLabel.textContent = "Alumni Email";
+                submitBtn.textContent = "Login as Alumni";
+                emailField.placeholder = "you@example.com";
+              }
+            });
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -3,3 +3,7 @@ alumni.db
 __pycache__/
 *.pyc
 venv/
+.venv/
+logs/
+*_capture.txt
+startup_*.log

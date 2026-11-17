@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Donate - AlumniMS{% endblock %}
+{% block content %}
+<h2 class="mb-4">Support Your Alma Mater</h2>
+
+<div class="card p-4" style="max-width:480px;">
+  {% if not razorpay_enabled %}
+  <div class="alert alert-warning">Online payments are not configured yet. Please contact the admin.</div>
+  {% endif %}
+  <form id="donateForm">
+    <div class="mb-3">
+      <label class="form-label">Amount (₹)</label>
+      <input type="number" step="1" min="1" id="donateAmount" class="form-control" placeholder="e.g. 500" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Purpose (optional)</label>
+      <input type="text" id="donatePurpose" class="form-control" placeholder="e.g. Scholarship fund">
+    </div>
+    <button type="submit" class="btn btn-primary w-100" id="donateBtn" {{ 'disabled' if not razorpay_enabled }}>
+      <i class="bi bi-heart-fill"></i> Donate Now
+    </button>
+  </form>
+  <p id="donateStatus" class="text-muted mt-3 mb-0"></p>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('donateForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const amount = document.getElementById('donateAmount').value;
+  const purpose = document.getElementById('donatePurpose').value;
+  const statusEl = document.getElementById('donateStatus');
+  const btn = document.getElementById('donateBtn');
+  btn.disabled = true;
+  statusEl.innerText = 'Creating order...';
+
+  try {
+    const orderRes = await fetch('{{ url_for("donate_create_order") }}', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, purpose })
+    });
+    const order = await orderRes.json();
+    if (order.error) { statusEl.innerText = order.error; btn.disabled = false; return; }
+
+    const rzp = new Razorpay({
+      key: order.key_id,
+      amount: order.amount,
+      currency: order.currency,
+      order_id: order.order_id,
+      name: 'AlumniMS',
+      description: purpose || 'Alumni donation',
+      handler: async function (response) {
+        statusEl.innerText = 'Verifying payment...';
+        const verifyRes = await fetch('{{ url_for("donate_verify") }}', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(response)
+        });
+        const verify = await verifyRes.json();
+        if (verify.ok) {
+          statusEl.innerText = 'Thank you! Your donation was received successfully.';
+          document.getElementById('donateForm').reset();
+        } else {
+          statusEl.innerText = verify.error || 'Payment verification failed.';
+        }
+        btn.disabled = false;
+      },
+      modal: { ondismiss: function () { btn.disabled = false; statusEl.innerText = 'Payment cancelled.'; } }
+    });
+    rzp.open();
+  } catch (err) {
+    statusEl.innerText = 'Something went wrong. Please try again.';
+    btn.disabled = false;
+  }
+});
+</script>
+{% endblock %}

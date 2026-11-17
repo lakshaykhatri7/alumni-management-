@@ -8,13 +8,30 @@
     <div class="col-md-6"><label class="form-label">Name *</label><input required name="name" class="form-control" value="{{ alumni.name if alumni else '' }}"></div>
     <div class="col-md-6"><label class="form-label">Email *</label><input required type="email" name="email" class="form-control" value="{{ alumni.email if alumni else '' }}"></div>
     <div class="col-md-6"><label class="form-label">Phone</label><input name="phone" class="form-control" value="{{ alumni.phone if alumni else '' }}"></div>
-    <div class="col-md-6"><label class="form-label">Batch Year</label><input type="number" name="batch_year" class="form-control" value="{{ alumni.batch_year if alumni else '' }}"></div>
+    <div class="col-md-6">
+      <label class="form-label">Passout Batch Year *</label>
+      <select required name="batch_year" class="form-select">
+        <option value="">Select year</option>
+        {% for y in range(max_year, min_year - 1, -1) %}
+          <option value="{{ y }}" {{ 'selected' if alumni and alumni.batch_year == y else '' }}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <div class="col-md-6"><label class="form-label">Department</label><input name="department" class="form-control" value="{{ alumni.department if alumni else '' }}"></div>
     <div class="col-md-6"><label class="form-label">City</label><input name="city" class="form-control" value="{{ alumni.city if alumni else '' }}"></div>
     <div class="col-md-6"><label class="form-label">Current Company</label><input name="current_company" class="form-control" value="{{ alumni.current_company if alumni else '' }}"></div>
     <div class="col-md-6"><label class="form-label">Designation</label><input name="designation" class="form-control" value="{{ alumni.designation if alumni else '' }}"></div>
     <div class="col-md-12"><label class="form-label">LinkedIn URL</label><input name="linkedin" class="form-control" value="{{ alumni.linkedin if alumni else '' }}"></div>
   </div>
+  {% if not alumni %}
+  <div class="form-check mt-3">
+    <input class="form-check-input" type="checkbox" name="send_email" id="send_email" value="1" {{ 'checked' if mail_on else '' }} {{ 'disabled' if not mail_on else '' }}>
+    <label class="form-check-label" for="send_email">Email login details (email + auto-generated password) to this alumni</label>
+    {% if not mail_on %}
+      <div class="form-text text-warning">Email alerts are not configured (MAIL_USERNAME/MAIL_PASSWORD missing in .env). The generated password will be shown here instead.</div>
+    {% endif %}
+  </div>
+  {% endif %}
   <div class="mt-4">
     <button class="btn btn-primary">Save</button>
     <a href="{{ url_for('alumni_list') }}" class="btn btn-outline-secondary">Cancel</a>

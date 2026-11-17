@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}My Profile - AlumniMS{% endblock %}
+{% block content %}
+<h2 class="mb-4">My Profile</h2>
+<div class="card p-4" style="max-width:700px;">
+<form method="post" enctype="multipart/form-data">
+  <div class="row g-3">
+    <div class="col-md-12 d-flex align-items-center gap-3">
+      {% if alumni and alumni.photo_path %}
+        <img src="{{ url_for('static', filename=alumni.photo_path) }}" alt="Profile photo" class="rounded-circle" style="width:72px;height:72px;object-fit:cover;">
+        <div>
+          <label class="form-label d-block mb-1">Profile Photo <span class="text-muted">(optional)</span></label>
+          <input type="file" name="photo" accept=".png,.jpg,.jpeg,.gif,.webp" class="form-control form-control-sm">
+          <div class="form-check mt-1">
+            <input type="checkbox" class="form-check-input" id="removePhoto" name="remove_photo" value="1">
+            <label class="form-check-label small" for="removePhoto">Remove current photo</label>
+          </div>
+        </div>
+      {% else %}
+        <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center" style="width:72px;height:72px;">
+          <i class="bi bi-person text-secondary" style="font-size:2rem;"></i>
+        </div>
+        <div>
+          <label class="form-label d-block mb-1">Profile Photo <span class="text-muted">(optional)</span></label>
+          <input type="file" name="photo" accept=".png,.jpg,.jpeg,.gif,.webp" class="form-control form-control-sm">
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-md-6"><label class="form-label">Name *</label><input required name="name" class="form-control" value="{{ alumni.name if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Email *</label><input required type="email" name="email" class="form-control" value="{{ alumni.email if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Phone</label><input name="phone" class="form-control" value="{{ alumni.phone if alumni else '' }}"></div>
+    <div class="col-md-6">
+      <label class="form-label">Passout Batch Year *</label>
+      <select required name="batch_year" class="form-select">
+        <option value="">Select year</option>
+        {% for y in range(max_year, min_year - 1, -1) %}
+          <option value="{{ y }}" {{ 'selected' if alumni and alumni.batch_year == y else '' }}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6"><label class="form-label">Department</label><input name="department" class="form-control" value="{{ alumni.department if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">City</label><input name="city" class="form-control" value="{{ alumni.city if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Current Company</label><input name="current_company" class="form-control" value="{{ alumni.current_company if alumni else '' }}"></div>
+    <div class="col-md-6"><label class="form-label">Designation</label><input name="designation" class="form-control" value="{{ alumni.designation if alumni else '' }}"></div>
+    <div class="col-md-12"><label class="form-label">LinkedIn URL</label><input name="linkedin" class="form-control" value="{{ alumni.linkedin if alumni else '' }}"></div>
+    <div class="col-md-12 form-check">
+      <input type="checkbox" class="form-check-input" id="networkingOptIn" name="networking_opt_in" {{ 'checked' if not alumni or alumni.networking_opt_in }}>
+      <label class="form-check-label" for="networkingOptIn">Include me in weekly AI-matched alumni introductions (Serendipity Engine)</label>
+    </div>
+  </div>
+  <div class="mt-4">
+    <button class="btn btn-primary">Save Changes</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+</div>
+{% endblock %}

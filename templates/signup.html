@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Create Account - AlumniMS{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7 col-md-9">
+    <div class="card shadow-sm">
+      <div class="card-header-clean text-center">
+        <h3 class="mb-0">Create Alumni Account</h3>
+        <p class="text-muted small mb-0 mt-1">Only for graduates who have passed out (batch {{ min_year }}–{{ max_year }})</p>
+      </div>
+      <div class="p-4">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name *</label>
+              <input required name="name" class="form-control" value="{{ form.name or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email *</label>
+              <input required type="email" name="email" class="form-control" value="{{ form.email or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Password *</label>
+              <input required type="password" name="password" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirm Password *</label>
+              <input required type="password" name="confirm_password" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Passout Batch Year *</label>
+              <select required name="batch_year" class="form-select">
+                <option value="">Select year</option>
+                {% for y in range(max_year, min_year - 1, -1) %}
+                  <option value="{{ y }}" {{ 'selected' if form.batch_year|string == y|string else '' }}>{{ y }}</option>
+                {% endfor %}
+              </select>
+              <small class="text-muted">Current students cannot register. Batch must have already passed out.</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input name="phone" class="form-control" value="{{ form.phone or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Department</label>
+              <input name="department" class="form-control" value="{{ form.department or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">City</label>
+              <input name="city" class="form-control" value="{{ form.city or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Current Company</label>
+              <input name="current_company" class="form-control" value="{{ form.current_company or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Designation</label>
+              <input name="designation" class="form-control" value="{{ form.designation or '' }}">
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">LinkedIn URL</label>
+              <input name="linkedin" class="form-control" value="{{ form.linkedin or '' }}">
+            </div>
+          </div>
+          <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Create Account</button>
+          </div>
+        </form>
+        <p class="text-center mt-3 mb-0">
+          Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

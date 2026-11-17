@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Messages - AlumniMS{% endblock %}
+{% block content %}
+<h3 class="page-title">Messages</h3>
+<div class="card">
+  <div class="card-header-clean">Conversations</div>
+  <table class="table mb-0">
+    <thead><tr><th>Alumnus</th><th>Last message</th><th>When</th><th></th></tr></thead>
+    <tbody>
+    {% for c in conversations %}
+      <tr>
+        <td>
+          <a href="{{ url_for('messages_thread', alumni_id=c.alumni_id) }}">{{ c.name }}</a>
+          {% if c.unread_count %}<span class="badge bg-danger ms-1">{{ c.unread_count }}</span>{% endif %}
+        </td>
+        <td class="text-truncate" style="max-width:360px;">{{ c.last_body or '-' }}</td>
+        <td class="text-muted small">{{ c.last_at }}</td>
+        <td><a href="{{ url_for('messages_thread', alumni_id=c.alumni_id) }}" class="btn btn-sm btn-outline-primary">Open</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="text-muted">No conversations yet. Visit an alumnus profile to start messaging.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

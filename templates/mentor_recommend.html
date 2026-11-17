@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Mentor Recommendation - AlumniMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="page-title mb-1">Career Mentor Recommendation</h2>
+    <p class="page-kicker">AI-guided suggestion for the best alumni mentor based on your goals.</p>
+  </div>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to dashboard</a>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header-clean">
+    Find guidance for your next step
+  </div>
+  <div class="p-3">
+    <form method="get">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-10">
+          <label class="form-label">Career goal</label>
+          <input type="text" name="goal" class="form-control" value="{{ goal }}" placeholder="e.g. software engineering, product management, data science">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if current %}
+<div class="mb-3">
+  <h5 class="mb-2">Your Top Mentor Match for {{ current.name }}</h5>
+  <p class="text-muted mb-0">Goal: {{ goal }}</p>
+</div>
+{% endif %}
+
+{% if recommendations %}
+<div class="row g-3">
+  {% for m in recommendations %}
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h5 class="mb-1"><a href="{{ url_for('alumni_profile', id=m.id) }}" class="text-decoration-none">{{ m.name }}</a></h5>
+            <small class="text-muted">{{ m.designation or 'Alumni Mentor' }}</small>
+          </div>
+          <span class="badge bg-success">{{ m.score }}/20</span>
+        </div>
+        <p class="mb-2 text-muted small">
+          {{ m.department or '-' }} • {{ m.current_company or '-' }} • Batch {{ m.batch_year or '-' }}
+        </p>
+        <div class="small mb-2"><strong>Why recommended:</strong> {{ m.reason }}</div>
+        <div class="small mb-1"><strong>Contact email:</strong> <a href="mailto:{{ m.email }}">{{ m.email }}</a></div>
+        <div class="small text-muted">{{ m.city or '-' }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <div class="card-body text-muted text-center py-5">
+    No mentor match found yet. Try a different career goal or add more alumni profile detail.
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -21,11 +21,16 @@
 
 <div class="card p-3">
 <table class="table table-hover align-middle">
-  <thead><tr><th>Alumni</th><th>Amount</th><th>Purpose</th><th>Date</th><th></th></tr></thead>
+  <thead><tr><th>Alumni</th><th>Amount</th><th>Purpose</th><th>Date</th><th>Status</th><th></th></tr></thead>
   <tbody>
   {% for d in donations %}
     <tr>
       <td>{{ d.alumni_name }}</td><td>₹{{ d.amount }}</td><td>{{ d.purpose or '-' }}</td><td>{{ d.donation_date }}</td>
+      <td>
+        {% if d.payment_status == 'paid' %}<span class="badge bg-success">Paid online</span>
+        {% elif d.payment_status == 'pending' %}<span class="badge bg-warning text-dark">Pending</span>
+        {% else %}<span class="badge bg-secondary">Manual</span>{% endif %}
+      </td>
       <td>
         <button class="btn btn-sm btn-outline-secondary" onclick="genThankYou('{{ d.alumni_name }}','{{ d.amount }}','{{ d.purpose or "" }}')" title="AI: draft thank-you email"><i class="bi bi-robot"></i></button>
         <form action="{{ url_for('donations_delete', id=d.id) }}" method="post" class="d-inline" onsubmit="return confirm('Delete?');">
@@ -34,7 +39,7 @@
       </td>
     </tr>
   {% else %}
-    <tr><td colspan="5" class="text-center text-muted">No donations yet.</td></tr>
+    <tr><td colspan="6" class="text-center text-muted">No donations yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

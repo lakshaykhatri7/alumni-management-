@@ -2,8 +2,11 @@ flask
 python-dotenv
 sentence-transformers
 google-genai
+openai
 openpyxl
 reportlab
 flask-mail
 psycopg2-binary
 gunicorn
+razorpay
+apscheduler

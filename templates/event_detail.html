@@ -23,6 +23,7 @@
   </div>
   <div class="col-md-6">
     <div class="card p-3">
+      {% if is_admin %}
       <h5>Register Alumni</h5>
       <form method="post" action="{{ url_for('events_register', id=event.id) }}" class="d-flex gap-2 mt-2">
         <select name="alumni_id" class="form-select" required>
@@ -33,6 +34,16 @@
         </select>
         <button class="btn btn-primary">Add</button>
       </form>
+      {% else %}
+      <h5>Your Registration</h5>
+      {% if already_registered %}
+        <p class="text-muted mt-2 mb-0">You're already registered for this event.</p>
+      {% else %}
+        <form method="post" action="{{ url_for('events_register', id=event.id) }}" class="mt-2">
+          <button class="btn btn-primary">Register me for this event</button>
+        </form>
+      {% endif %}
+      {% endif %}
     </div>
   </div>
 </div>

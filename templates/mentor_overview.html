@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Mentor Overview - AlumniMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="page-title mb-1">Mentor Match Overview</h2>
+    <p class="page-kicker">See the best-matched mentor suggested for each alumnus.</p>
+  </div>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to dashboard</a>
+</div>
+
+<div class="card">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Alumnus</th><th>Suggested Mentor</th><th>Match Score</th><th>Why</th></tr></thead>
+    <tbody>
+      {% for p in pairings %}
+        <tr>
+          <td><a href="{{ url_for('alumni_profile', id=p.alumnus.id) }}">{{ p.alumnus.name }}</a></td>
+          {% if p.mentor %}
+            <td><a href="{{ url_for('alumni_profile', id=p.mentor.id) }}">{{ p.mentor.name }}</a></td>
+            <td><span class="badge bg-success">{{ p.mentor.score }}/20</span></td>
+            <td class="small text-muted">{{ p.mentor.reason }}</td>
+          {% else %}
+            <td class="text-muted" colspan="3">No suitable match found yet.</td>
+          {% endif %}
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="text-center text-muted">No alumni yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

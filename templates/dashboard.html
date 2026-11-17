@@ -6,11 +6,15 @@
     <h2 class="page-title mb-1">Dashboard</h2>
     <p class="page-kicker">A clear view of your alumni community.</p>
   </div>
+  {% if is_admin %}
   <div class="d-flex gap-2">
     <a href="{{ url_for('events_add') }}" class="btn btn-outline-secondary"><i class="bi bi-calendar-plus me-1"></i> Event</a>
     <a href="{{ url_for('alumni_add') }}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i> Add alumni</a>
   </div>
+  {% endif %}
 </div>
+
+{% if is_admin %}
 <div class="row g-3 mb-4">
   <div class="col-sm-6 col-xl-3"><div class="stat-card bg-grad-primary"><i class="bi bi-people-fill icon-badge"></i><h3>{{ stats.alumni }}</h3><div class="label">Total Alumni</div></div></div>
   <div class="col-sm-6 col-xl-3"><div class="stat-card bg-grad-success"><i class="bi bi-calendar-event-fill icon-badge"></i><h3>{{ stats.events }}</h3><div class="label">Events</div></div></div>
@@ -50,4 +54,72 @@
     </div>
   </div>
 </div>
+
+{% else %}
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header-clean d-flex justify-content-between align-items-center">Upcoming Events <a class="section-link" href="{{ url_for('events_list') }}">View all</a></div>
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Title</th><th>Date</th><th>Location</th></tr></thead>
+        <tbody>
+        {% for e in upcoming_events %}
+          <tr><td><a href="{{ url_for('events_detail', id=e.id) }}" class="text-decoration-none fw-medium">{{ e.title }}</a></td><td>{{ e.event_date or '-' }}</td><td>{{ e.location or '-' }}</td></tr>
+        {% else %}
+          <tr><td colspan="3" class="text-muted text-center py-4">No events yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header-clean d-flex justify-content-between align-items-center">Job Opportunities <a class="section-link" href="{{ url_for('jobs_list') }}">View all</a></div>
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Title</th><th>Company</th><th>Location</th></tr></thead>
+        <tbody>
+        {% for j in recent_jobs %}
+          <tr><td class="fw-medium">{{ j.title }}</td><td>{{ j.company or '-' }}</td><td>{{ j.location or '-' }}</td></tr>
+        {% else %}
+          <tr><td colspan="3" class="text-muted text-center py-4">No job posts yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if smart_connections %}
+<div class="card mt-4">
+  <div class="card-header-clean d-flex justify-content-between align-items-center">
+    Smart Alumni Connections
+    <span class="badge bg-success-subtle text-success">{{ spotlight_name }}'s strongest network matches</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Batch</th>
+          <th>Department</th>
+          <th>Why connect</th>
+          <th>Match score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for match in smart_connections %}
+        <tr>
+          <td><a href="{{ url_for('alumni_profile', id=match.id) }}" class="text-decoration-none fw-medium">{{ match.name }}</a></td>
+          <td>{{ match.batch_year or '-' }}</td>
+          <td>{{ match.department or '-' }}</td>
+          <td><span class="badge bg-light text-dark">{{ match.reason }}</span></td>
+          <td><strong>{{ match.score }}</strong>/20</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

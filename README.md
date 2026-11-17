@@ -23,6 +23,18 @@ GEMINI_API_KEY=your_key_here
 ```
 `app.py` loads it automatically via `python-dotenv`; no need to export env vars manually.
 
+## Online Donations (Razorpay)
+Alumni can pay donations online via Razorpay Checkout (test mode works out of the box).
+1. Sign up free at https://dashboard.razorpay.com/ and grab **Test Mode** API keys.
+2. Add to `.env`:
+```
+RAZORPAY_KEY_ID=rzp_test_xxxxx
+RAZORPAY_KEY_SECRET=your_test_secret
+```
+3. Logged-in alumni see a **Donate** link that opens the Razorpay checkout; payments are verified server-side
+   (signature check) before being recorded with status `paid`. Admin-entered donations are tagged `manual`.
+Without these keys, the Donate page shows a "not configured" message; everything else still works.
+
 ## Structure
 ```
 app.py                 # routes + DB logic (sqlite3, no ORM)

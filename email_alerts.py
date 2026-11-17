@@ -34,3 +34,16 @@ def send_bulk_email(subject, body, recipients):
         except Exception as e:
             print(f"Email failed for {email}: {e}")
     return {"sent": sent, "skipped": False}
+
+
+def send_single_email(subject, body, recipient):
+    """Sends to exactly one recipient. Returns True on success, False if skipped/failed."""
+    if not mail_configured() or not recipient:
+        return False
+    try:
+        msg = Message(subject=subject, recipients=[recipient], body=body)
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Email failed for {recipient}: {e}")
+        return False

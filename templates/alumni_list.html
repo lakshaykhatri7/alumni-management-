@@ -22,7 +22,7 @@
 
 <div class="card p-3">
 <table class="table table-hover align-middle">
-  <thead><tr><th>Name</th><th>Email</th><th>Batch</th><th>Department</th><th>Company</th><th>City</th><th>Actions</th></tr></thead>
+  <thead><tr><th>Name</th><th>Email</th><th>Batch</th><th>Department</th><th>Company</th><th>City</th><th>Account</th><th>Actions</th></tr></thead>
   <tbody>
   {% for a in alumni %}
     <tr>
@@ -33,14 +33,37 @@
       <td>{{ a.current_company or '-' }}</td>
       <td>{{ a.city or '-' }}</td>
       <td>
+        {% if account_status.get(a.id) == False %}
+          <span class="badge bg-danger">Suspended</span>
+        {% elif account_status.get(a.id) == True %}
+          <span class="badge bg-success">Active</span>
+        {% else %}
+          <span class="badge bg-secondary">No login</span>
+        {% endif %}
+      </td>
+      <td class="text-nowrap">
         <a href="{{ url_for('alumni_edit', id=a.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+        {% if account_status.get(a.id) == True %}
+        <form action="{{ url_for('alumni_suspend', id=a.id) }}" method="post" class="d-inline" onsubmit="return confirm('Suspend this account?');">
+          <button class="btn btn-sm btn-outline-warning" title="Suspend account"><i class="bi bi-pause-circle"></i></button>
+        </form>
+        {% elif account_status.get(a.id) == False %}
+        <form action="{{ url_for('alumni_activate', id=a.id) }}" method="post" class="d-inline">
+          <button class="btn btn-sm btn-outline-success" title="Reactivate account"><i class="bi bi-play-circle"></i></button>
+        </form>
+        {% endif %}
+        {% if a.id in account_status %}
+        <form action="{{ url_for('alumni_delete_account', id=a.id) }}" method="post" class="d-inline" onsubmit="return confirm('Remove login access for this alumni? Profile record is kept.');">
+          <button class="btn btn-sm btn-outline-secondary" title="Delete account (keep profile)"><i class="bi bi-person-x"></i></button>
+        </form>
+        {% endif %}
         <form action="{{ url_for('alumni_delete', id=a.id) }}" method="post" class="d-inline" onsubmit="return confirm('Delete this alumni?');">
-          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+          <button class="btn btn-sm btn-outline-danger" title="Delete alumni profile"><i class="bi bi-trash"></i></button>
         </form>
       </td>
     </tr>
   {% else %}
-    <tr><td colspan="7" class="text-center text-muted">No alumni found.</td></tr>
+    <tr><td colspan="8" class="text-center text-muted">No alumni found.</td></tr>
   {% endfor %}
   </tbody>
 </table>
