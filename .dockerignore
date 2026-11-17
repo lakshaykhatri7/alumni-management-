@@ -1,0 +1,10 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+logs/
+*.log
+*_capture.txt
+.git/
+alumni.db
