@@ -208,7 +208,7 @@ def generate_donation_thankyou(alumni_name, amount, purpose):
         return {"error": "Needs free Groq API key (GROQ_API_KEY)."}
     prompt = f"""Write a warm, brief thank-you email (max 100 words) from a college alumni office to a donor.
 Donor name: {alumni_name}
-Amount: {amount}
+Amount: \u20b9{amount} (Indian Rupees - always use the \u20b9 symbol, never $ or USD)
 Purpose: {purpose}
 Return only the email body, no subject line."""
     try:
