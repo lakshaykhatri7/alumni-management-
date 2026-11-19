@@ -14,6 +14,8 @@ def configure_mail(app):
     app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
     app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
     app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_USERNAME")
+    # Fail fast instead of hanging the whole worker if SMTP ports are blocked (e.g. Render)
+    app.config["MAIL_TIMEOUT"] = int(os.environ.get("MAIL_TIMEOUT", 10))
     mail.init_app(app)
 
 
