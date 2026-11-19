@@ -7,3 +7,6 @@ venv/
 logs/
 *_capture.txt
 startup_*.log
+
+app_runtime.stdout.log
+app_runtime.stderr.log
