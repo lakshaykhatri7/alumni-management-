@@ -39,6 +39,7 @@ def send_bulk_email(subject, body, recipients):
 def send_single_email(subject, body, recipient):
     """Sends to exactly one recipient. Returns True on success, False if skipped/failed."""
     if not mail_configured() or not recipient:
+        print(f"Email skipped for {recipient}: MAIL_USERNAME/MAIL_PASSWORD not configured")
         return False
     try:
         msg = Message(subject=subject, recipients=[recipient], body=body)
