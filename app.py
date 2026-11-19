@@ -23,6 +23,10 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "alumni_secret_key_change_me")
 configure_mail(app)
 
+# used to send delayed emails (e.g. donation thank-you 2 minutes after the donation is recorded)
+scheduler = BackgroundScheduler()
+scheduler.start()
+
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)) if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET else None
@@ -765,6 +769,32 @@ def events_register(id):
 
 
 # ---------- DONATIONS ----------
+def send_donation_thankyou(donation_id):
+    """Runs in the background scheduler, 2 minutes after a donation is recorded."""
+    conn = get_db()
+    donation = conn.execute(
+        """SELECT d.*, a.name alumni_name, a.email alumni_email FROM donations d
+           JOIN alumni a ON a.id=d.alumni_id WHERE d.id=?""",
+        (donation_id,),
+    ).fetchone()
+    conn.close()
+    if not donation or not donation.get("alumni_email"):
+        return
+    result = ai.generate_donation_thankyou(donation["alumni_name"], donation["amount"], donation.get("purpose") or "")
+    body = result.get("text") or (
+        f"Dear {donation['alumni_name']},\n\nThank you so much for your generous donation of "
+        f"\u20b9{donation['amount']}. Your support means a lot to our alumni community.\n\n"
+        f"Regards,\nAlumni Management Team"
+    )
+    send_single_email("Thank you for your donation - AlumniMS", body, donation["alumni_email"])
+
+
+def schedule_donation_thankyou(donation_id):
+    run_date = datetime.now() + timedelta(minutes=2)
+    scheduler.add_job(send_donation_thankyou, "date", run_date=run_date, args=[donation_id],
+                       id=f"donation_thankyou_{donation_id}", replace_existing=True)
+
+
 @app.route("/donations")
 @login_required
 @admin_required
@@ -783,11 +813,14 @@ def donations_list():
 @admin_required
 def donations_add():
     conn = get_db()
-    conn.execute("INSERT INTO donations (alumni_id,amount,purpose,donation_date,payment_status) VALUES (?,?,?,?,?)",
-                 (request.form["alumni_id"], request.form["amount"], request.form.get("purpose"),
-                  request.form.get("donation_date") or datetime.now().strftime("%Y-%m-%d"), "manual"))
+    row = conn.execute(
+        "INSERT INTO donations (alumni_id,amount,purpose,donation_date,payment_status) VALUES (?,?,?,?,?) RETURNING id",
+        (request.form["alumni_id"], request.form["amount"], request.form.get("purpose"),
+         request.form.get("donation_date") or datetime.now().strftime("%Y-%m-%d"), "manual"),
+    ).fetchone()
     conn.commit()
     conn.close()
+    schedule_donation_thankyou(row["id"])
     flash("Donation recorded.", "success")
     return redirect(url_for("donations_list"))
 
@@ -893,6 +926,7 @@ def donate_verify():
     )
     conn.commit()
     conn.close()
+    schedule_donation_thankyou(donation["id"])
     flash("Thank you! Your donation was received successfully.", "success")
     return jsonify({"ok": True})
 
@@ -1312,9 +1346,7 @@ init_db()  # runs on both `python app.py` and gunicorn/production startup
 
 # weekly serendipity matching - guarded so Flask's debug reloader doesn't start it twice
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    scheduler = BackgroundScheduler()
     scheduler.add_job(run_serendipity_matching, "cron", day_of_week="mon", hour=9, id="serendipity_matching")
-    scheduler.start()
 
 if __name__ == "__main__":
     debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
