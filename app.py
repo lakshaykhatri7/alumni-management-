@@ -1014,7 +1014,7 @@ def ai_chat_ask():
 
     # mentor matching isn't stored in the DB (it's computed live), so the NL->SQL path can never
     # answer it - handle "mentor" questions directly using the same logic as the Career Mentor page
-    if "mentor" in question.lower() and session.get("alumni_id") and session.get("role") != "admin":
+    if "mentor" in question.lower() and session.get("role") != "admin" and session.get("alumni_id"):
         conn = get_db()
         alumni = conn.execute("SELECT * FROM alumni ORDER BY name").fetchall()
         current = conn.execute("SELECT * FROM alumni WHERE id = ?", (session["alumni_id"],)).fetchone()
@@ -1024,6 +1024,22 @@ def ai_chat_ask():
             m = top[0]
             return jsonify({"answer": f"Your top career mentor match is {m['name']} ({m['email']}) - {m['reason']}."})
         return jsonify({"answer": "No suitable mentor match was found for your profile yet."})
+
+    # admins asking about mentor matches for a specific named alumnus
+    if "mentor" in question.lower() and session.get("role") == "admin":
+        conn = get_db()
+        alumni = conn.execute("SELECT * FROM alumni ORDER BY name").fetchall()
+        conn.close()
+        named = next(
+            (a for a in alumni if a["name"] and a["name"].lower() in question.lower()), None
+        )
+        if named:
+            top = ai.recommend_best_mentor(named, alumni, "career guidance", top_k=1)
+            if top:
+                m = top[0]
+                return jsonify({"answer": f"{named['name']}'s top career mentor match is {m['name']} ({m['email']}) - {m['reason']}."})
+            return jsonify({"answer": f"No suitable mentor match was found for {named['name']}."})
+        return jsonify({"answer": "Couldn't find an alumnus with that name. See the Mentor Matches page for the full overview."})
 
     result = ai.ask_alumni_chatbot(question, history, current_user=current_user)
     return jsonify(result)

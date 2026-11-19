@@ -150,6 +150,9 @@ SQL:"""
     except Exception as e:
         return {"error": _llm_error_message(e)}
     sql = sql.strip().strip("`").replace("sql\n", "").strip()
+    # a single trailing semicolon is harmless and common in LLM output - strip it before validating,
+    # but keep blocking any semicolon elsewhere (that would indicate statement chaining)
+    sql = sql.rstrip().rstrip(";").rstrip()
 
     if not sql.lower().startswith("select"):
         return {"error": "Could not generate a safe query for that question."}
@@ -173,7 +176,7 @@ SQL:"""
     # Ask the LLM to phrase a natural answer from the results
     summary_prompt = f"""Question: {question}
 SQL used: {sql}
-Results (JSON): {json.dumps(results)[:3000]}
+Results (JSON): {json.dumps(results, default=str)[:3000]}
 Give a short, direct natural-language answer (1-3 sentences) based only on these results."""
     try:
         answer = _llm_complete(summary_prompt)
