@@ -177,7 +177,8 @@ SQL:"""
     summary_prompt = f"""Question: {question}
 SQL used: {sql}
 Results (JSON): {json.dumps(results, default=str)[:3000]}
-Give a short, direct natural-language answer (1-3 sentences) based only on these results."""
+Give a short, direct natural-language answer (1-3 sentences) based only on these results.
+If a sum/total/count value is null or missing (e.g. no matching rows), state it as 0, not "null" or "no value"."""
     try:
         answer = _llm_complete(summary_prompt)
     except Exception as e:
