@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, session
 import os
 import hashlib
+import json
 import logging
 import re
 import secrets
@@ -107,7 +108,7 @@ def admin_required(func):
 
 @app.before_request
 def enforce_login():
-    public_paths = {"login", "logout", "signup", "static", "forgot_password", "reset_password"}
+    public_paths = {"login", "logout", "signup", "static", "forgot_password", "reset_password", "healthz"}
     endpoint = request.endpoint or ""
     if endpoint in public_paths:
         return
@@ -286,17 +287,41 @@ def reset_password(token):
     conn.close()
     return render_template("reset_password.html", token=token)
 
-# ---------- Logging: writes to logs/app.log (rotates at 1MB, keeps 5 backups) ----------
+# ---------- Logging: writes structured JSON lines to logs/app.log (rotates at 1MB, keeps 5 backups) ----------
+class JsonFormatter(logging.Formatter):
+    def format(self, record):
+        payload = {
+            "time": self.formatTime(record, "%Y-%m-%dT%H:%M:%S%z"),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        if record.exc_info:
+            payload["exc_info"] = self.formatException(record.exc_info)
+        return json.dumps(payload, default=str)
+
+
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 _file_handler = RotatingFileHandler(os.path.join(LOG_DIR, "app.log"), maxBytes=1_000_000, backupCount=5)
-_file_handler.setFormatter(logging.Formatter(
-    "%(asctime)s %(levelname)s [%(name)s] %(message)s"
-))
+_file_handler.setFormatter(JsonFormatter())
 _file_handler.setLevel(logging.INFO)
 app.logger.addHandler(_file_handler)
 app.logger.setLevel(logging.INFO)
 logging.getLogger("werkzeug").addHandler(_file_handler)
+
+
+@app.route("/healthz")
+def healthz():
+    """Health check for Render/uptime monitors - verifies the app can actually reach the database."""
+    try:
+        conn = get_db()
+        conn.execute("SELECT 1")
+        conn.close()
+        return jsonify({"status": "ok"}), 200
+    except Exception as e:
+        app.logger.exception("Health check failed")
+        return jsonify({"status": "error", "detail": str(e)}), 503
 
 
 def build_network_matches(source_alumni, all_alumni, limit=4):

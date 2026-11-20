@@ -26,7 +26,7 @@
   <div id="chatAnswer" class="chat-thread" aria-live="polite"></div>
   <div class="input-group chat-composer">
     <input type="text" id="chatQ" class="form-control" placeholder="Ask a question..." {{ 'disabled' if not gemini_on }}>
-    <button class="btn btn-primary" onclick="askBot()" {{ 'disabled' if not gemini_on }}>Ask</button>
+    <button class="btn btn-primary" id="askBtn" onclick="askBot()" {{ 'disabled' if not gemini_on }}>Ask</button>
   </div>
 </div>
 
@@ -49,14 +49,18 @@
 <script>
 async function askBot() {
   const input = document.getElementById('chatQ');
+  const askBtn = document.getElementById('askBtn');
   const q = input.value.trim();
-  if (!q) return;
+  if (!q || askBtn.disabled) return;
   const box = document.getElementById('chatAnswer');
   const history = [...chatHistory];
   addMessage('user', q);
   input.value = '';
   addMessage('assistant', 'Thinking...', 'thinking');
   input.disabled = true;
+  askBtn.disabled = true;
+  const originalBtnText = askBtn.innerHTML;
+  askBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
   try {
     const res = await fetch('/ai/chat/ask', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -79,6 +83,8 @@ async function askBot() {
     replaceThinking(`Network error: ${networkErr.message}`, true);
   } finally {
     input.disabled = false;
+    askBtn.disabled = false;
+    askBtn.innerHTML = originalBtnText;
     input.focus();
   }
 }

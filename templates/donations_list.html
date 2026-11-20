@@ -32,7 +32,7 @@
         {% else %}<span class="badge bg-secondary">Manual</span>{% endif %}
       </td>
       <td>
-        <button class="btn btn-sm btn-outline-secondary" onclick="genThankYou('{{ d.alumni_name }}','{{ d.amount }}','{{ d.purpose or "" }}')" title="AI: draft thank-you email"><i class="bi bi-robot"></i></button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="genThankYou(this,'{{ d.alumni_name }}','{{ d.amount }}','{{ d.purpose or "" }}')" title="AI: draft thank-you email"><i class="bi bi-robot"></i></button>
         <form action="{{ url_for('donations_delete', id=d.id) }}" method="post" class="d-inline" onsubmit="return confirm('Delete?');">
           <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
         </form>
@@ -52,16 +52,25 @@
   </div></div>
 </div>
 <script>
-async function genThankYou(name, amount, purpose) {
+async function genThankYou(btn, name, amount, purpose) {
+  if (btn.disabled) return;
+  btn.disabled = true;
+  const originalBtnHtml = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
   const modal = new bootstrap.Modal(document.getElementById('thankyouModal'));
   document.getElementById('thankyouText').innerText = 'Generating...';
   modal.show();
-  const res = await fetch('/ai/generate/thankyou', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({name, amount, purpose})
-  });
-  const data = await res.json();
-  document.getElementById('thankyouText').innerText = data.error || data.text;
+  try {
+    const res = await fetch('/ai/generate/thankyou', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, amount, purpose})
+    });
+    const data = await res.json();
+    document.getElementById('thankyouText').innerText = data.error || data.text;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalBtnHtml;
+  }
 }
 </script>
 {% endblock %}
