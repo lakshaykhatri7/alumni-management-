@@ -815,9 +815,19 @@ def send_donation_thankyou(donation_id):
     )
     send_single_email("Thank you for your donation - AlumniMS", body, donation["alumni_email"])
 
+
+def notify_admins_of_donation(donation_id):
+    """Sent immediately (not delayed) so admins see it right away, regardless of alumni email."""
     conn = get_db()
+    donation = conn.execute(
+        """SELECT d.*, a.name alumni_name FROM donations d
+           JOIN alumni a ON a.id=d.alumni_id WHERE d.id=?""",
+        (donation_id,),
+    ).fetchone()
     admin_emails = [r["email"] for r in conn.execute("SELECT email FROM users WHERE role='admin'").fetchall()]
     conn.close()
+    if not donation or not admin_emails:
+        return
     admin_body = (f"{donation['alumni_name']} donated \u20b9{donation['amount']} "
                   f"({donation.get('purpose') or 'general'}).")
     send_bulk_email("New donation received - AlumniMS", admin_body, admin_emails)
@@ -855,6 +865,7 @@ def donations_add():
     conn.commit()
     conn.close()
     schedule_donation_thankyou(row["id"])
+    notify_admins_of_donation(row["id"])
     flash("Donation recorded.", "success")
     return redirect(url_for("donations_list"))
 
@@ -961,6 +972,7 @@ def donate_verify():
     conn.commit()
     conn.close()
     schedule_donation_thankyou(donation["id"])
+    notify_admins_of_donation(donation["id"])
     flash("Thank you! Your donation was received successfully.", "success")
     return jsonify({"ok": True})
 
