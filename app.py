@@ -727,6 +727,8 @@ def events_add():
         conn.commit()
         if request.form.get("notify"):
             emails = [r["email"] for r in conn.execute("SELECT email FROM alumni").fetchall()]
+            admin_emails = [r["email"] for r in conn.execute("SELECT email FROM users WHERE role='admin'").fetchall()]
+            emails = list(dict.fromkeys(emails + admin_emails))
             body = f"New event: {request.form['title']}\n{request.form.get('description','')}\nDate: {request.form.get('event_date','TBA')}\nLocation: {request.form.get('location','TBA')}"
             result = send_bulk_email(f"New Event: {request.form['title']}", body, emails)
             if result["skipped"]:
@@ -812,6 +814,13 @@ def send_donation_thankyou(donation_id):
         f"Regards,\nAlumni Management Team"
     )
     send_single_email("Thank you for your donation - AlumniMS", body, donation["alumni_email"])
+
+    conn = get_db()
+    admin_emails = [r["email"] for r in conn.execute("SELECT email FROM users WHERE role='admin'").fetchall()]
+    conn.close()
+    admin_body = (f"{donation['alumni_name']} donated \u20b9{donation['amount']} "
+                  f"({donation.get('purpose') or 'general'}).")
+    send_bulk_email("New donation received - AlumniMS", admin_body, admin_emails)
 
 
 def schedule_donation_thankyou(donation_id):
@@ -1000,8 +1009,10 @@ def jobs_add():
                   request.form.get("salary"), request.form.get("description")))
     conn.commit()
 
-    # every new job is announced to all alumni by email (if mail is configured)
+    # every new job is announced to all alumni and admins by email (if mail is configured)
     emails = [r["email"] for r in conn.execute("SELECT email FROM alumni").fetchall()]
+    admin_emails = [r["email"] for r in conn.execute("SELECT email FROM users WHERE role='admin'").fetchall()]
+    emails = list(dict.fromkeys(emails + admin_emails))
     salary_line = f"\nSalary: {request.form['salary']}" if request.form.get("salary") else ""
     body = (f"New job posted: {request.form['title']} at {request.form.get('company','-')}\n"
             f"Location: {request.form.get('location','-')}{salary_line}\n{request.form.get('description','')}")
